@@ -7,12 +7,74 @@ import {
   Twitch,
   Twitter,
   Send,
+  CheckCircle,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useRef, useState, useEffect } from 'react';
+import emailjs from '@emailjs/browser';
 
 export const ContactSection = () => {
+  const formRef = useRef(null);
+  const [status, setStatus] = useState(null);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    message: '',
+  });
+
+  const onChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  useEffect(() => {
+    if (status === 'sent') {
+      setShowSuccess(true);
+      const timer = setTimeout(() => {
+        setShowSuccess(false);
+        setStatus(null);
+      }, 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [status]);
+
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    setStatus('sending');
+    try {
+      await emailjs.sendForm(
+        import.meta.env.VITE_EMAILJS_SERVICE_ID,
+        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+        formRef.current,
+        { publicKey: import.meta.env.VITE_EMAILJS_PUBLIC_KEY },
+      );
+      setStatus('sent');
+      setForm({ name: '', email: '', message: '' });
+    } catch (err) {
+      setStatus(`error: ${err.message}`);
+    }
+  };
+
   return (
     <section id="contact" className="py-24 px-4 relative bg-secondary/30">
+      {/* Success Toast */}
+      {showSuccess && (
+        <div className="fixed top-6 right-6 z-50 animate-fade-in">
+          <div className="bg-card border border-primary/20 rounded-lg p-4 shadow-lg backdrop-blur-sm">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-full bg-primary/10">
+                <CheckCircle className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <p className="font-medium text-foreground">Success!</p>
+                <p className="text-sm text-muted-foreground">
+                  Message sent successfully.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="container mx-auto max-w-5xl">
         <h2 className="text-3xl md:text-4xl font-bold mb-4 text-center">
           Get In <span className="text-primary"> Touch</span>
@@ -89,7 +151,7 @@ export const ContactSection = () => {
 
           <div className="bg-card p-8 rounded-lg shadow-xs">
             <h3 className="text-2xl font-semibold mb-6"> Send a Message </h3>
-            <form action="" className="space-y-6">
+            <form ref={formRef} onSubmit={onSubmit} className="space-y-6">
               <div>
                 <label
                   htmlFor="name"
@@ -103,8 +165,10 @@ export const ContactSection = () => {
                   id="name"
                   name="name"
                   required
-                  className="w-full px-4 py-3 rounded-md border border-input bg-background focus:outline-hidden focus:ring-2 focus:ring-primary"
+                  className="w-full px-4 py-3 rounded-md border border-input bg-background focus:outline-none focus:ring-2 focus:ring-primary"
                   placeholder="Jack O'Neill"
+                  value={form.name}
+                  onChange={onChange}
                 />
               </div>
 
@@ -121,8 +185,10 @@ export const ContactSection = () => {
                   id="email"
                   name="email"
                   required
-                  className="w-full px-4 py-3 rounded-md border border-input bg-background focus:outline-hidden focus:ring-2 focus:ring-primary"
+                  className="w-full px-4 py-3 rounded-md border border-input bg-background focus:outline-none focus:ring-2 focus:ring-primary"
                   placeholder="example@gmail.com"
+                  value={form.email}
+                  onChange={onChange}
                 />
               </div>
               <div>
@@ -133,13 +199,15 @@ export const ContactSection = () => {
                   {' '}
                   Your Message{' '}
                 </label>
-                <input
-                  type="text"
+                <textarea
                   id="message"
                   name="message"
                   required
-                  className="w-full px-4 py-3 rounded-md border border-input bg-background focus:outline-hidden focus:ring-2 focus:ring-primary resize-none"
+                  rows={2}
+                  className="w-full px-4 py-3 rounded-md border border-input bg-background focus:outline-none focus:ring-2 focus:ring-primary resize-none"
                   placeholder="How are you?"
+                  value={form.message}
+                  onChange={onChange}
                 />
               </div>
               <button
@@ -147,8 +215,9 @@ export const ContactSection = () => {
                 className={cn(
                   'cosmic-button w-full flex items-center justify-center gap-2',
                 )}
+                disabled={status === 'sending'}
               >
-                Send Message
+                {status === 'sending' ? 'Sending…' : 'Send'}
                 <Send size={16} />
               </button>
             </form>
