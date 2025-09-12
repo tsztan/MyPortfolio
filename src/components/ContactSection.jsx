@@ -89,12 +89,12 @@ export const ContactSection = () => {
               {' '}
               Contact Information{' '}
             </h3>
-            <div className="space-y-6 justify-center">
-              <div className="flex items-start space-x-4">
+            <div className="space-y-6 flex flex-col items-center">
+              <div className="flex items-start space-x-4 w-80">
                 <div className="p-3 rounded-full bg-primary/10">
                   <Mail className="h-6 w-6 text-primary" />
                 </div>
-                <div>
+                <div className="flex-1 text-center">
                   <h4 className="font-medium"> Email </h4>
                   <a
                     href="mailto:tamara@sztanski.com"
@@ -104,11 +104,11 @@ export const ContactSection = () => {
                   </a>
                 </div>
               </div>
-              <div className="flex items-start space-x-4">
+              <div className="flex items-start space-x-4 w-80">
                 <div className="p-3 rounded-full bg-primary/10">
                   <Phone className="h-6 w-6 text-primary" />
                 </div>
-                <div>
+                <div className="flex-1 text-center">
                   <h4 className="font-medium"> Phone </h4>
                   <a
                     href="tel:+51903409067"
@@ -118,11 +118,11 @@ export const ContactSection = () => {
                   </a>
                 </div>
               </div>
-              <div className="flex items-start space-x-4">
+              <div className="flex items-start space-x-4 w-80">
                 <div className="p-3 rounded-full bg-primary/10">
                   <MapPin className="h-6 w-6 text-primary" />
                 </div>
-                <div>
+                <div className="flex-1 text-center">
                   <h4 className="font-medium"> Location </h4>
                   <a className="text-muted-foreground hover:text-primary transition-colors">
                     Lima, Peru
